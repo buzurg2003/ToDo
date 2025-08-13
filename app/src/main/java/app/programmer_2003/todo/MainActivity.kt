@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,7 +25,17 @@ class MainActivity : ComponentActivity() {
     setContent {
       ToDoTheme {
         val navController = rememberNavController()
-        val taskViewModel: TaskViewModel = viewModel()
+        val taskViewModel: TaskViewModel = viewModel(
+          factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+              if (modelClass.isAssignableFrom(TaskViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return TaskViewModel(application) as T
+              }
+              throw IllegalArgumentException("Unknown ViewModel class")
+            }
+          },
+        )
         Scaffold(
           modifier = Modifier.fillMaxSize()
         ) { innerPadding ->
